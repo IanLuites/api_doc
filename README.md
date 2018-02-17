@@ -23,14 +23,15 @@ Documentation can be found at
 Upcoming and in progress features:
 
   * [X] Basic documentation setup.
-  * [ ] Plug.Router documentation.
-  * [ ] Warn on forwards to undocumented routers.
+  * [X] Plug.Router documentation.
+  * [X] Warn on forwards to undocumented routers.
   * [ ] Warn for undocumented endpoints.
   * [ ] Warn undocumented path variable.
   * [ ] @api false to disable undocumented warnings.
   * [ ] Add default response[s].
   * [ ] Add schemas on different levels.
   * [ ] Basic configuration.
+  * [ ] Cleanup documenters and improve documentation.
 
 Output formats:
   * [ ] [OpenAPI 3.0](https://github.com/OAI/OpenAPI-Specification)
