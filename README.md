@@ -17,3 +17,25 @@ end
 
 Documentation can be found at
 [https://hexdocs.pm/api_doc](https://hexdocs.pm/api_doc).
+
+## Upcoming Features
+
+Upcoming and in progress features:
+
+  * [ ] Basic Documentation Setup.
+  * [ ] Warn on forwards to undocumented routers.
+  * [ ] Warn for undocumented endpoints.
+  * [ ] Warn undocumented path variable.
+  * [ ] @api false to disable undocumented warnings.
+  * [ ] Add default response[s].
+  * [ ] Add schemas on different levels.
+  * [ ] Basic configuration.
+
+Output formats:
+  * [ ] [OpenAPI 3.0](https://github.com/OAI/OpenAPI-Specification)
+  * [ ] [API Blueprint](https://apiblueprint.org/documentation/specification.html)
+
+## License
+
+_API Doc_ source code is released under [the MIT License](LICENSE).
+Check [LICENSE](LICENSE) file for more information.
