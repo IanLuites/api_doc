@@ -47,7 +47,7 @@ defmodule APIDoc.APIDocumenter do
       Uses `APIDoc.Format.OpenAPI3` by default.
       """
       @spec format(atom) :: String.t()
-      def format(formatter \\ APIDoc.YAML), do: formatter.format(__document__())
+      def format(formatter \\ APIDoc.Format.OpenAPI3), do: formatter.format(__document__())
 
       @doc false
       @spec __document__ :: map
