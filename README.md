@@ -22,7 +22,8 @@ Documentation can be found at
 
 Upcoming and in progress features:
 
-  * [ ] Basic Documentation Setup.
+  * [X] Basic documentation setup.
+  * [ ] Plug.Router documentation.
   * [ ] Warn on forwards to undocumented routers.
   * [ ] Warn for undocumented endpoints.
   * [ ] Warn undocumented path variable.
