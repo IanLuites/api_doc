@@ -2,7 +2,10 @@ locals_without_parens = [
   server: 1,
   server: 2,
   schema: 2,
-  schema: 3
+  schema: 3,
+  response: 3,
+  param: 3,
+  param: 4
 ]
 
 [

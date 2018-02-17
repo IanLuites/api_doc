@@ -5,8 +5,14 @@ defmodule APIDoc do
 
   @doc false
   defmacro __using__(opts \\ []) do
-    quote do
-      use APIDoc.APIDocumenter, unquote(opts)
+    if Plug.Builder in Keyword.keys(__CALLER__.macros) do
+      quote do
+        use APIDoc.PlugRouterDocumenter, unquote(opts)
+      end
+    else
+      quote do
+        use APIDoc.APIDocumenter, unquote(opts)
+      end
     end
   end
 end
