@@ -16,6 +16,7 @@ defmodule APIDoc.PlugRouterDocumenter do
       Module.register_attribute(__MODULE__, :summary, accumulate: false, persist: false)
       Module.register_attribute(__MODULE__, :param, accumulate: true, persist: false)
       Module.register_attribute(__MODULE__, :response, accumulate: true, persist: false)
+      Module.register_attribute(__MODULE__, :security, accumulate: true, persist: false)
 
       require APIDoc.PlugRouterDocumenter
       import APIDoc.PlugRouterDocumenter, only: [response: 3, param: 3, param: 4]
@@ -33,8 +34,26 @@ defmodule APIDoc.PlugRouterDocumenter do
       (forward = Module.get_attribute(env.module, :plug_forward_target)) && is_list(path) ->
         generate_forward(env.module, forward, path)
 
-      :otherwise ->
+      Module.delete_attribute(env.module, :api) == false ->
         :ignore
+
+      :undocumented ->
+        Logger.warn(fn ->
+          safe_module = env.module |> Module.split() |> Enum.join(".")
+          safe_method = if is_binary(method), do: method, else: "*"
+
+          safe_path =
+            if is_tuple(path) do
+              ""
+            else
+              path
+              |> Enum.map(&if(is_tuple(&1), do: elem(&1, 0), else: &1))
+              |> Enum.map(&to_string/1)
+              |> Enum.join("/")
+            end
+
+          "APIDoc: #{safe_method} /#{safe_path} in #{safe_module} is undocumented, please document or use `@api false`."
+        end)
     end
   end
 
@@ -53,35 +72,42 @@ defmodule APIDoc.PlugRouterDocumenter do
       description:
         if(doc = Module.delete_attribute(module, :doc), do: elem(doc, 1) || nil, else: nil),
       parameters: Module.delete_attribute(module, :param) || [],
-      responses: Module.delete_attribute(module, :response) || []
+      responses: Module.delete_attribute(module, :response) || [],
+      security: Module.delete_attribute(module, :security) || []
     })
   end
 
   defp generate_forward(module, forward, path) do
-    if {:__api_doc__, 0} in forward.__info__(:functions) do
-      last = List.last(path)
+    cond do
+      Module.delete_attribute(module, :api) == false ->
+        :ignore
 
-      if is_tuple(last) && elem(last, 0) == :| do
-        Module.put_attribute(module, :generated_api_doc, %{
-          to: forward,
-          description:
-            if(doc = Module.delete_attribute(module, :doc), do: elem(doc, 1) || nil, else: nil),
-          path:
-            Enum.map(path, fn
-              {field, _, nil} -> field
-              {:|, _, [{field, _, nil} | _]} -> field
-              {:|, _, [step | _]} -> step
-              step -> step
-            end)
-        })
-      end
-    else
-      Logger.warn(fn ->
-        safe_module = module |> Module.split() |> Enum.join(".")
-        safe_forward = forward |> Module.split() |> Enum.join(".")
+      {:__api_doc__, 0} in forward.__info__(:functions) ->
+        last = List.last(path)
 
-        "APIDoc: #{safe_module} forwards to #{safe_forward}, but #{safe_forward} is not documented."
-      end)
+        if is_tuple(last) && elem(last, 0) == :| do
+          Module.put_attribute(module, :generated_api_doc, %{
+            to: forward,
+            description:
+              if(doc = Module.delete_attribute(module, :doc), do: elem(doc, 1) || nil, else: nil),
+            path:
+              Enum.map(path, fn
+                {field, _, nil} -> field
+                {:|, _, [{field, _, nil} | _]} -> field
+                {:|, _, [step | _]} -> step
+                step -> step
+              end),
+            security: Module.delete_attribute(module, :security) || []
+          })
+        end
+
+      :undocumented ->
+        Logger.warn(fn ->
+          safe_module = module |> Module.split() |> Enum.join(".")
+          safe_forward = forward |> Module.split() |> Enum.join(".")
+
+          "APIDoc: #{safe_module} forwards to #{safe_forward}, but #{safe_forward} is not documented."
+        end)
     end
   end
 

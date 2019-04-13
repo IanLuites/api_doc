@@ -9,13 +9,17 @@ defmodule APIDoc.APIDocumenter do
     - `@api` (string) name of the API.
     - `@vsn` (string) version of the API.
     - `@moduledoc` (string) API description. Supports markdown.
+    - `@contact` (string) contact info.
 
   The following macros can be used for documenting:
 
     - `schema/2`, `schema/3`: Adds data schemas to the documentation.
     - `server/1`, `server/2`: Add possible servers to the documentation.
   """
+  require Logger
+  alias APIDoc.Doc.Contact
   alias APIDoc.Doc.Schema
+  alias APIDoc.Doc.Security
   alias APIDoc.Doc.Server
   alias Mix.Project
 
@@ -23,11 +27,16 @@ defmodule APIDoc.APIDocumenter do
   defmacro __using__(opts \\ []) do
     quote do
       Module.register_attribute(__MODULE__, :api, accumulate: false, persist: false)
+      Module.register_attribute(__MODULE__, :contact, accumulate: false, persist: false)
+      Module.register_attribute(__MODULE__, :security, accumulate: true, persist: false)
       Module.register_attribute(__MODULE__, :server, accumulate: true, persist: false)
       Module.register_attribute(__MODULE__, :schema, accumulate: true, persist: false)
 
       require APIDoc.APIDocumenter
-      import APIDoc.APIDocumenter, only: [server: 1, server: 2, schema: 2, schema: 3]
+
+      import APIDoc.APIDocumenter,
+        only: [server: 1, server: 2, schema: 2, schema: 3, security: 4, security: 5]
+
       @before_compile APIDoc.APIDocumenter
       @router unquote(opts[:router])
     end
@@ -39,6 +48,21 @@ defmodule APIDoc.APIDocumenter do
     version = Module.get_attribute(env.module, :vsn) || Project.config()[:version]
     servers = Module.get_attribute(env.module, :server) || []
     schemas = Module.get_attribute(env.module, :schema) || []
+    security = Module.get_attribute(env.module, :security) || []
+
+    contact =
+      with %{"email" => email, "name" => name} <-
+             Regex.named_captures(
+               ~r/^(?'name'.*?)\ ?<(?'email'.*)>$/,
+               Module.get_attribute(env.module, :contact) || ""
+             ) do
+        %Contact{email: email, name: name}
+      else
+        _ -> nil
+      end
+
+    # Perform validations
+    schemas |> Enum.each(&Schema.validate!/1)
 
     quote do
       @doc ~S"""
@@ -56,10 +80,12 @@ defmodule APIDoc.APIDocumenter do
           info: %APIDoc.Doc.Info{
             name: unquote(name),
             version: unquote(version),
-            description: @moduledoc
+            description: @moduledoc,
+            contact: unquote(Macro.escape(contact))
           },
           servers: unquote(Macro.escape(servers)),
           schemas: unquote(Macro.escape(schemas)),
+          security: unquote(Macro.escape(Enum.into(security, %{}))),
           endpoints: @router.__api_doc__()
         }
       end
@@ -90,6 +116,23 @@ defmodule APIDoc.APIDocumenter do
         url: unquote(url),
         description: unquote(description)
       }
+    end
+  end
+
+  @doc ~S"""
+  Add security scheme to documentation.
+  ```
+  """
+  @spec security(atom, String.t(), Security.type(), Security.location(), String.t() | nil) :: term
+  defmacro security(id, name, type, location, description \\ nil) do
+    quote do
+      @security {unquote(id),
+                 %Security{
+                   name: unquote(Macro.expand(name, __CALLER__)),
+                   type: unquote(type),
+                   in: unquote(location),
+                   description: unquote(description)
+                 }}
     end
   end
 
