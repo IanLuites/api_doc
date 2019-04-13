@@ -2,6 +2,8 @@ defmodule APIDoc.Format.APIBlueprint do
   @moduledoc ~S"""
   """
 
+  @doc @moduledoc
+  @spec format(APIDoc.Document.t()) :: String.t()
   def format(document) do
     """
     Format: 1A
@@ -21,11 +23,13 @@ defmodule APIDoc.Format.APIBlueprint do
   defp paths(%{path: path, endpoints: endpoints}, document, pre) do
     path = pre <> format_path(path)
 
-    endpoints |> Enum.sort_by(&Enum.count(&1.path)) |> Enum.map(&paths(&1, document, path))
+    endpoints
+    |> Enum.sort_by(&Enum.count(&1.path))
+    |> Enum.map(&paths(&1, document, path))
     |> Enum.join("\n")
   end
 
-  defp paths(data = %{id: api}, document, pre) do
+  defp paths(data = %{id: _api}, document, pre) do
     path = pre <> format_path(data.path)
 
     method = data.method |> to_string() |> String.upcase()
@@ -40,7 +44,9 @@ defmodule APIDoc.Format.APIBlueprint do
     #{data.parameters |> Enum.map(&param/1) |> Enum.join("\n")}
 
     #{
-      data.responses |> Enum.sort_by(& &1.status) |> Enum.map(&endpoint(&1, document))
+      data.responses
+      |> Enum.sort_by(& &1.status)
+      |> Enum.map(&endpoint(&1, document))
       |> Enum.join("\n")
     }
     """
@@ -71,7 +77,7 @@ defmodule APIDoc.Format.APIBlueprint do
       document.schemas
       |> Enum.find(&(Macro.to_string(&1.name) == data))
       |> Map.get(:example)
-      |> Poison.encode!(pretty: true)
+      |> Jason.encode!(pretty: true)
       |> String.split("\n")
       |> Enum.map(&("        " <> &1))
       |> Enum.join("\n")
@@ -79,7 +85,7 @@ defmodule APIDoc.Format.APIBlueprint do
     "+ Response #{status} (application/json)\n\n#{example}\n"
   end
 
-  defp endpoint(status, type, data, _document) do
+  defp endpoint(status, type, _data, _document) do
     "+ Response #{status} (#{type})"
   end
 end

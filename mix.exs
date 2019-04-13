@@ -1,14 +1,14 @@
 defmodule APIDoc.MixProject do
   use Mix.Project
 
-  @version "0.0.1-pro1"
+  @version "0.0.2"
 
   def project do
     [
       app: :api_doc,
       version: @version,
       description: "API documentation generator for Elixir.",
-      elixir: "~> 1.6",
+      elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -60,7 +60,8 @@ defmodule APIDoc.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:analyze, ">= 0.0.0", only: [:dev, :test], runtime: false}
+      {:jason, "~> 1.1"},
+      {:analyze, "~> 0.1.3", only: [:dev, :test], runtime: false}
     ]
   end
 end

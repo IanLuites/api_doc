@@ -25,6 +25,8 @@ defmodule APIDoc.PlugRouterDocumenter do
     end
   end
 
+  @doc false
+  @spec on_def(term, :def | :defp, atom, term, term, term) :: term
   # credo:disable-for-next-line
   def on_def(env, :defp, :do_match, [{:conn, _, Plug.Router}, method, path, _], _guards, _body) do
     cond do
@@ -38,27 +40,30 @@ defmodule APIDoc.PlugRouterDocumenter do
         :ignore
 
       :undocumented ->
-        Logger.warn(fn ->
-          safe_module = env.module |> Module.split() |> Enum.join(".")
-          safe_method = if is_binary(method), do: method, else: "*"
-
-          safe_path =
-            if is_tuple(path) do
-              ""
-            else
-              path
-              |> Enum.map(&if(is_tuple(&1), do: elem(&1, 0), else: &1))
-              |> Enum.map(&to_string/1)
-              |> Enum.join("/")
-            end
-
-          "APIDoc: #{safe_method} /#{safe_path} in #{safe_module} is undocumented, please document or use `@api false`."
-        end)
+        Logger.warn(fn -> warn_undocumented(env.module, method, path) end)
     end
   end
 
   # credo:disable-for-next-line
   def on_def(_env, _type, _name, _args, _guards, _body), do: :ignore
+
+  defp warn_undocumented(module, method, path) do
+    safe_module = module |> Module.split() |> Enum.join(".")
+    safe_method = if is_binary(method), do: method, else: "*"
+
+    # credo:disable-for-next-line
+    safe_path =
+      if is_tuple(path) do
+        ""
+      else
+        path
+        |> Enum.map(&if(is_tuple(&1), do: elem(&1, 0), else: &1))
+        |> Enum.map(&to_string/1)
+        |> Enum.join("/")
+      end
+
+    "APIDoc: #{safe_method} /#{safe_path} in #{safe_module} is undocumented, please document or use `@api false`."
+  end
 
   defp generate_api_doc(module, api, method, path) do
     atom_method = method |> String.downcase() |> String.to_existing_atom()

@@ -1,5 +1,7 @@
 defmodule Mix.Tasks.Api.Doc.Gen do
   use Mix.Task
+  alias APIDoc.Config
+  alias Mix.Task
 
   @shortdoc "Generate API documentation (use `--help` for options)"
   @moduledoc @shortdoc
@@ -23,8 +25,9 @@ defmodule Mix.Tasks.Api.Doc.Gen do
   }
 
   @doc false
+  @spec run(term) :: term
   def run(argv) do
-    Mix.Task.run("compile")
+    Task.run("compile")
 
     options =
       [
@@ -34,7 +37,7 @@ defmodule Mix.Tasks.Api.Doc.Gen do
       |> Keyword.merge(parse_arguments(argv))
       |> Enum.map(&validate_option/1)
 
-    data = APIDoc.Config.document().format(options[:format])
+    data = Config.document().format(options[:format])
 
     if options[:output] == :stdout do
       IO.puts(data)

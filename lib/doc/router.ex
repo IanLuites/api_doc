@@ -2,7 +2,7 @@ defmodule APIDoc.Doc.Router do
   @moduledoc ~S"""
 
   """
-  alias APIDoc.Doc.{Endpoint, Security}
+  alias APIDoc.Doc.Endpoint
 
   @typedoc @moduledoc
   @type t :: %__MODULE__{

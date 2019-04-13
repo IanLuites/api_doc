@@ -2,9 +2,13 @@ defmodule APIDoc.Format.HTML do
   @moduledoc ~S"""
   """
 
+  alias APIDoc.{Config, Format.OpenAPI3}
+
+  @doc @moduledoc
+  @spec format(APIDoc.Document.t()) :: String.t()
   def format(document) do
-    shins = APIDoc.Config.directory(:shins)
-    docs = APIDoc.Format.OpenAPI3.format(document)
+    shins = Config.directory(:shins)
+    docs = OpenAPI3.format(document)
     File.write("./test.yml", docs)
 
     System.cmd("widdershins", [

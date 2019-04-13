@@ -2,10 +2,12 @@ defmodule APIDoc.Format.OpenAPI3 do
   @moduledoc ~S"""
   """
 
+  @doc @moduledoc
+  @spec format(APIDoc.Document.t()) :: String.t()
   def format(document) do
     paths = document.endpoints |> Enum.map(&elem(paths(&1), 1)) |> Enum.join("\n")
     schemas = document.schemas |> Enum.map(&format_schema/1) |> Enum.join("\n")
-    securitySchemes = document.security |> Enum.map(&format_security/1) |> Enum.join("\n")
+    security_schemes = document.security |> Enum.map(&format_security/1) |> Enum.join("\n")
 
     """
     openapi: 3.0.0
@@ -19,7 +21,7 @@ defmodule APIDoc.Format.OpenAPI3 do
       schemas:
     #{schemas}
       securitySchemes:
-    #{securitySchemes}
+    #{security_schemes}
     """
     |> String.replace(~r/\n{2,}/, "\n")
   end
@@ -90,7 +92,7 @@ defmodule APIDoc.Format.OpenAPI3 do
      """}
   end
 
-  def format_security_use([secure | security]) do
+  defp format_security_use([secure | security]) do
     [
       "        - #{Macro.to_string(secure)}: []"
       | security |> Enum.map(&"          #{Macro.to_string(&1)}: []")
@@ -98,13 +100,13 @@ defmodule APIDoc.Format.OpenAPI3 do
     |> Enum.join("\n")
   end
 
-  def format_security_use(secure) do
+  defp format_security_use(secure) do
     "        - #{Macro.to_string(secure)}: []"
   end
 
-  def format_description(nil), do: ""
+  defp format_description(nil), do: ""
 
-  def format_description(description) do
+  defp format_description(description) do
     "      description: |\n        " <>
       (description |> String.split("\n") |> Enum.join("\n        "))
   end
@@ -189,7 +191,8 @@ defmodule APIDoc.Format.OpenAPI3 do
     #{schema.required |> Enum.map(&"        - #{&1}") |> Enum.join("\n")}
           properties:
     #{
-      schema.properties |> Enum.map(&format_property(&1, schema.example || %{}))
+      schema.properties
+      |> Enum.map(&format_property(&1, schema.example || %{}))
       |> Enum.join("\n")
     }
     """
