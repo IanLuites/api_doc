@@ -13,7 +13,8 @@ defmodule APIDoc.Doc.Endpoint do
           description: String.t() | nil,
           parameters: [Param.t()],
           responses: [Response.t()],
-          tags: [String.t()]
+          tags: [String.t()],
+          security: [atom | [atom]]
         }
 
   @enforce_keys [
@@ -30,6 +31,7 @@ defmodule APIDoc.Doc.Endpoint do
     description: nil,
     parameters: [],
     responses: [],
-    tags: []
+    tags: [],
+    security: []
   ]
 end

@@ -16,14 +16,16 @@ defmodule APIDoc.Doc.Info do
   }
   ```
   """
+  alias APIDoc.Doc.Contact
 
   @typedoc @moduledoc
   @type t :: %__MODULE__{
           name: String.t(),
           version: String.t(),
-          description: String.t()
+          description: String.t(),
+          contact: Contact.t() | nil
         }
 
   @enforce_keys [:name, :version, :description]
-  defstruct @enforce_keys
+  defstruct @enforce_keys ++ [contact: nil]
 end

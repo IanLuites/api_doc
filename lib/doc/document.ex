@@ -6,6 +6,7 @@ defmodule APIDoc.Doc.Document do
   alias APIDoc.Doc.{
     Info,
     Schema,
+    Security,
     Server
   }
 
@@ -14,6 +15,7 @@ defmodule APIDoc.Doc.Document do
           info: Info.t(),
           servers: [Server.t()],
           schemas: [Schema.t()],
+          security: [Security.t()],
           endpoints: list
         }
 
@@ -21,6 +23,7 @@ defmodule APIDoc.Doc.Document do
     :info,
     :servers,
     :schemas,
+    :security,
     :endpoints
   ]
   defstruct @enforce_keys

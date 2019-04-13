@@ -2,12 +2,13 @@ defmodule APIDoc.Doc.Router do
   @moduledoc ~S"""
 
   """
-  alias APIDoc.Doc.Endpoint
+  alias APIDoc.Doc.{Endpoint, Security}
 
   @typedoc @moduledoc
   @type t :: %__MODULE__{
           path: [String.t() | atom],
           endpoints: [t | Endpoint.t()],
+          security: [atom | [atom]],
           description: String.t() | nil
         }
 
@@ -18,6 +19,7 @@ defmodule APIDoc.Doc.Router do
   defstruct [
     :path,
     :endpoints,
+    security: [],
     description: nil
   ]
 end
