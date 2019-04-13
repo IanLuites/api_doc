@@ -1,15 +1,17 @@
 defmodule APIDoc.MixProject do
   use Mix.Project
 
-  @version "0.0.1-rc"
+  @version "0.0.1-pro1"
 
   def project do
     [
       app: :api_doc,
       version: @version,
+      description: "API documentation generator for Elixir.",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      package: package(),
 
       # Testing
       test_coverage: [tool: ExCoveralls],
@@ -40,6 +42,7 @@ defmodule APIDoc.MixProject do
         # Elixir
         "lib",
         "mix.exs",
+        ".formatter.exs",
         "README*",
         "LICENSE"
       ],

@@ -36,6 +36,7 @@ Upcoming and in progress features:
 Output formats:
   * [ ] [OpenAPI 3.0](https://github.com/OAI/OpenAPI-Specification)
   * [ ] [API Blueprint](https://apiblueprint.org/documentation/specification.html)
+  * [ ] [Postman Collection](https://www.getpostman.com/collection)
 
 ## License
 

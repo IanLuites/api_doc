@@ -5,7 +5,9 @@ locals_without_parens = [
   schema: 3,
   response: 3,
   param: 3,
-  param: 4
+  param: 4,
+  security: 4,
+  security: 5
 ]
 
 [
