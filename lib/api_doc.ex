@@ -5,14 +5,18 @@ defmodule APIDoc do
 
   @doc false
   defmacro __using__(opts \\ []) do
-    if Plug.Builder in Keyword.keys(__CALLER__.macros) do
-      quote do
-        use APIDoc.PlugRouterDocumenter, unquote(opts)
+    keys = Keyword.keys(__CALLER__.macros)
+
+    documenter =
+      cond do
+        Plug.Builder in keys -> APIDoc.PlugRouterDocumenter
+        Phoenix.Router in keys -> APIDoc.PhoenixRouterDocumenter
+        Phoenix.Controller in keys -> APIDoc.PhoenixControllerDocumenter
+        :default -> APIDoc.APIDocumenter
       end
-    else
-      quote do
-        use APIDoc.APIDocumenter, unquote(opts)
-      end
+
+    quote do
+      use unquote(documenter), unquote(opts)
     end
   end
 end
