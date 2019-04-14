@@ -20,6 +20,8 @@ defmodule APIDoc.Documenter.Helper do
     end
   end
 
+  @doc false
+  @spec generate_api_doc(module, term, atom, [String.t() | atom]) :: :ok
   def generate_api_doc(module, api, method, path) do
     Module.put_attribute(module, :generated_api_doc, %Endpoint{
       id: api,

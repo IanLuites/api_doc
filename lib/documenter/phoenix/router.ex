@@ -26,7 +26,7 @@ defmodule APIDoc.PhoenixRouterDocumenter do
 
     quote do
       @doc false
-      @spec __api_doc__ :: list
+      @spec __api_doc__ :: [APIDoc.Doc.Endpoint.t()]
       def __api_doc__ do
         Enum.map(
           unquote(Macro.escape(doc)),

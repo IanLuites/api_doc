@@ -94,6 +94,7 @@ defmodule APIDoc.PlugRouterDocumenter do
   defmacro __before_compile__(_env) do
     quote do
       @doc false
+      @spec __api_doc__ :: [APIDoc.Doc.Endpoint.t()]
       def __api_doc__ do
         Enum.map(@generated_api_doc, fn
           endpoint = %{to: to} ->
