@@ -28,9 +28,19 @@ defmodule APIDoc.PhoenixRouterDocumenter do
       @doc false
       @spec __api_doc__ :: [APIDoc.Doc.Endpoint.t()]
       def __api_doc__ do
-        Enum.map(
-          unquote(Macro.escape(doc)),
-          fn %{lookup: {module, name}, fallback: fallback} ->
+        unquote(Macro.escape(doc))
+        |> Enum.map(fn
+          %{lookup: {module, _, :forward}, fallback: fallback = %{path: path}} ->
+            if {:__api_doc__, 0} in module.__info__(:functions) do
+              Enum.map(
+                module.__api_doc__,
+                fn e = %Endpoint{path: p} -> %{e | path: path ++ p} end
+              )
+            else
+              fallback
+            end
+
+          %{lookup: {module, name, _}, fallback: fallback} ->
             if {:__controller_doc__, 0} in module.__info__(:functions) do
               case Map.fetch(module.__controller_doc__(), name) do
                 {:ok, doc} -> %{doc | method: fallback.method, path: fallback.path}
@@ -39,8 +49,8 @@ defmodule APIDoc.PhoenixRouterDocumenter do
             else
               fallback
             end
-          end
-        )
+        end)
+        |> List.flatten()
       end
     end
   end
@@ -55,7 +65,7 @@ defmodule APIDoc.PhoenixRouterDocumenter do
 
     document(routes, params_g[false] || [], responses_g[false] || [], [
       %{
-        lookup: {route.plug, route.opts},
+        lookup: {route.plug, route.opts, route.kind},
         fallback: %Endpoint{
           id: route.path,
           tags: [],
