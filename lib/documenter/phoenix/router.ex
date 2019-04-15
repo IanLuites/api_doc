@@ -59,6 +59,9 @@ defmodule APIDoc.PhoenixRouterDocumenter do
 
   defp document([], _params, _responses, acc), do: acc
 
+  defp document([%{verb: :*, kind: kind} | routes], params, responses, acc) when kind != :forward,
+    do: document(routes, params, responses, acc)
+
   defp document([route | routes], params, responses, acc) do
     params_g = Enum.group_by(params, &(&1.line < route.line))
     responses_g = Enum.group_by(responses, &(&1.line < route.line))
@@ -86,6 +89,7 @@ defmodule APIDoc.PhoenixRouterDocumenter do
     |> String.trim_leading("/")
     |> String.split("/")
     |> Enum.map(fn
+      "*" <> var -> String.to_atom(var)
       ":" <> var -> String.to_atom(var)
       var -> var
     end)
