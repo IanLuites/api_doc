@@ -12,7 +12,8 @@ defmodule APIDoc.Doc.Param do
           description: String.t(),
           required: boolean,
           schema: map,
-          example: any
+          example: any,
+          line: pos_integer
         }
 
   @enforce_keys [
@@ -27,6 +28,7 @@ defmodule APIDoc.Doc.Param do
     :description,
     :schema,
     required: false,
-    example: nil
+    example: nil,
+    line: 1
   ]
 end

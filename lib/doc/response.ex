@@ -7,7 +7,8 @@ defmodule APIDoc.Doc.Response do
   @type t :: %__MODULE__{
           status: pos_integer | :default,
           description: String.t(),
-          content: map
+          content: map,
+          line: pos_integer
         }
 
   @enforce_keys [
@@ -15,5 +16,5 @@ defmodule APIDoc.Doc.Response do
     :description,
     :content
   ]
-  defstruct @enforce_keys
+  defstruct @enforce_keys ++ [line: 1]
 end
