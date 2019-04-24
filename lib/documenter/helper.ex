@@ -30,7 +30,7 @@ defmodule APIDoc.Documenter.Helper do
       method: method,
       path: Enum.map(path, &if(is_tuple(&1), do: elem(&1, 0), else: &1)),
       description:
-        if(doc = Module.delete_attribute(module, :doc), do: elem(doc, 1) || nil, else: nil),
+        if(doc = Module.get_attribute(module, :doc), do: elem(doc, 1) || nil, else: nil),
       parameters: Module.delete_attribute(module, :param) || [],
       responses: Module.delete_attribute(module, :response) || [],
       security: Module.delete_attribute(module, :security) || []
