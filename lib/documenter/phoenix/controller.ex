@@ -33,7 +33,7 @@ defmodule APIDoc.PhoenixControllerDocumenter do
 
     quote do
       @doc false
-      @spec __controller_doc__ :: %{atom => APIDoc.Doc.Endpoint.t()}
+      @spec __controller_doc__ :: map
       def __controller_doc__, do: unquote(Macro.escape(doc))
     end
   end
